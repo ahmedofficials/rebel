@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صفحة المحتوى - REBEL</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: #0f2e3f;
+            color: white;
+            padding: 20px;
+            position: relative;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: #1b646d;
+            border-radius: 10px;
+        }
+
+        .search-bar {
+            width: 70%;
+            padding: 10px;
+            border: none;
+            border-radius: 50px;
+            outline: none;
+            background-color: #111;
+            color: #fff;
+            transition: background-color 0.3s;
+        }
+
+        .search-bar:focus {
+            background-color: #333;
+        }
+
+        .icon {
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            color: #40e0d0;
+            transition: transform 0.3s, color 0.3s;
+        }
+
+        .icon:hover {
+            transform: scale(1.2);
+            color: #ffffff;
+        }
+
+        .content-section {
+            margin-top: 20px;
+        }
+
+        .post {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .post-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .comment-section {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #40e0d0;
+            display: none;
+        }
+
+        .comment {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .comment-input {
+            width: 100%;
+            padding: 8px;
+            border-radius: 20px;
+            border: none;
+            background-color: #222;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .comment-input:focus {
+            outline: none;
+        }
+
+        .interactive-icon {
+            position: relative;
+        }
+
+        .publish-options {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background-color: #1b646d;
+            border-radius: 10px;
+            padding: 10px;
+            z-index: 100;
+        }
+
+        .publish-options div {
+            margin: 10px 0;
+            cursor: pointer;
+            color: white;
+        }
+
+        .publish-options div:hover {
+            color: #40e0d0;
+        }
+
+        #post-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #1b646d;
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 1000;
+        }
+
+        #post-modal input,
+        #post-modal textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border: none;
+            background-color: #222;
+            color: white;
+        }
+
+        #post-modal button {
+            padding: 10px 20px;
+            background-color: #40e0d0;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        .file-upload-label {
+            display: none;
+            padding: 10px;
+            background-color: #40e0d0;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .comment-toggle {
+            cursor: pointer;
+            color: #40e0d0;
+            margin-top: 10px;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .rating-icon {
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+            transition: color 0.3s;
+        }
+
+        .rating-icon:hover {
+            color: #40e0d0;
+        }
+
+        .rating-count {
+            color: #40e0d0;
+            margin-left: 5px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <input type="text" class="search-bar" placeholder="ابحث هنا..." oninput="searchPosts(this.value)">
+        <div class="interactive-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <div class="publish-options">
+                <div onclick="openPostModal('video')">نشر فيديو</div>
+                <div onclick="openPostModal('image')">نشر صورة</div>
+                <div onclick="openPostModal('text')">نشر منشور نصي</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="content-section" id="content-section">
+        <!-- سيتم نشر المحتوى هنا -->
+    </div>
+
+    <!-- نافذة نشر المحتوى -->
+    <div class="overlay" id="overlay"></div>
+
+    <div id="post-modal">
+        <h2>نشر محتوى جديد</h2>
+        <input type="text" id="post-title" placeholder="أدخل عنوان المنشور">
+        <textarea id="post-content" placeholder="أدخل المحتوى"></textarea>
+        <label class="file-upload-label" id="file-upload-label">
+            اختر ملف
+            <input type="file" id="file-input">
+        </label>
+        <button onclick="publishPost()">نشر</button>
+    </div>
+
+    <script>
+        // إظهار / إخفاء خيارات النشر
+        const interactiveIcon = document.querySelector('.interactive-icon');
+        const publishOptions = document.querySelector('.publish-options');
+        interactiveIcon.addEventListener('click', () => {
+            publishOptions.style.display = publishOptions.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // فتح نافذة النشر
+        const postModal = document.getElementById('post-modal');
+        const overlay = document.getElementById('overlay');
+        const fileUploadLabel = document.getElementById('file-upload-label');
+        const postContentField = document.getElementById('post-content');
+        let postType = '';
+
+        function openPostModal(type) {
+            postType = type;
+            postModal.style.display = 'block';
+            overlay.style.display = 'block';
+
+            // إظهار زر اختيار الملف فقط عند نشر صورة أو فيديو
+            if (type === 'video' || type === 'image') {
+                fileUploadLabel.style.display = 'block';
+                postContentField.style.display = 'none'; // إخفاء محتوى النص إذا كان فيديو أو صورة
+            } else {
+                fileUploadLabel.style.display = 'none';
+                postContentField.style.display = 'block'; // إظهار المحتوى النصي فقط
+            }
+        }
+
+        overlay.addEventListener('click', () => {
+            postModal.style.display = 'none';
+            overlay.style.display = 'none';
+        });
+
+        // نشر المحتوى
+        function publishPost() {
+            const title = document.getElementById('post-title').value;
+            const content = document.getElementById('post-content').value;
+            const fileInput = document.getElementById('file-input').files[0];
+
+            const postSection = document.getElementById('content-section');
+            const newPost = document.createElement('div');
+            newPost.classList.add('post');
+
+            let fileElement = '';
+
+            if (fileInput) {
+                const fileType = fileInput.type.split('/')[0];
+
+                // إنشاء URL للملف المرفوع
+                const fileURL = URL.createObjectURL(fileInput);
+
+                if (fileType === 'image') {
+                    fileElement = `<img src="${fileURL}" alt="Image" style="width: 100%; border-radius: 10px;">`;
+                } else if (fileType === 'video') {
+                    fileElement = `<video controls width="100%" style="border-radius: 10px;"><source src="${fileURL}" type="${fileInput.type}">دعم الفيديو غير متوفر</video>`;
+                }
+            }
+
+            newPost.innerHTML = `
+                <div class="post-title">${title}</div>
+                ${fileElement ? fileElement : `<p>${content}</p>`}
+                <div class="rating">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="rating-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" onclick="ratePost(this, 1)">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                    </svg>
+                    <span class="rating-count" id="upvotes-${postSection.children.length}">0</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="rating-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" onclick="ratePost(this, -1)">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                    <span class="rating-count" id="downvotes-${postSection.children.length}">0</span>
+                </div>
+                <div class="comment-toggle" onclick="toggleComments(this)">عرض التعليقات</div>
+                <div class="comment-section">
+                    <input type="text" class="comment-input" placeholder="اكتب تعليقك..." onkeypress="addComment(event, this)">
+                </div>
+            `;
+
+            postSection.appendChild(newPost);
+
+            postModal.style.display = 'none';
+            overlay.style.display = 'none';
+        }
+
+        // إظهار / إخفاء التعليقات
+        function toggleComments(toggleElement) {
+            const commentSection = toggleElement.nextElementSibling;
+            commentSection.style.display = commentSection.style.display === 'block' ? 'none' : 'block';
+            toggleElement.textContent = commentSection.style.display === 'block' ? 'إخفاء التعليقات' : 'عرض التعليقات';
+        }
+
+        // إضافة تعليق
+        function addComment(event, inputElement) {
+            if (event.key === 'Enter') {
+                const commentSection = inputElement.closest('.comment-section');
+                const newComment = document.createElement('div');
+                newComment.classList.add('comment');
+                newComment.innerHTML = `<p>${inputElement.value}</p>`;
+                commentSection.appendChild(newComment);
+                inputElement.value = '';
+            }
+        }
+
+        // تقييم المنشور
+        const userRatings = {}; // لتخزين تقييمات المستخدمين
+
+        function ratePost(iconElement, vote) {
+            const postElement = iconElement.closest('.post');
+            const postId = Array.from(postElement.parentNode.children).indexOf(postElement);
+            const upvoteCount = postElement.querySelector('.rating-count:nth-of-type(1)');
+            const downvoteCount = postElement.querySelector('.rating-count:nth-of-type(2)');
+
+            if (!userRatings[postId]) {
+                userRatings[postId] = { upvoted: false, downvoted: false };
+            }
+
+            if (vote === 1 && !userRatings[postId].upvoted) {
+                userRatings[postId].upvoted = true;
+                upvoteCount.textContent = parseInt(upvoteCount.textContent) + 1;
+                if (userRatings[postId].downvoted) {
+                    downvoteCount.textContent = parseInt(downvoteCount.textContent) - 1;
+                    userRatings[postId].downvoted = false;
+                }
+            } else if (vote === -1 && !userRatings[postId].downvoted) {
+                userRatings[postId].downvoted = true;
+                downvoteCount.textContent = parseInt(downvoteCount.textContent) + 1;
+                if (userRatings[postId].upvoted) {
+                    upvoteCount.textContent = parseInt(upvoteCount.textContent) - 1;
+                    userRatings[postId].upvoted = false;
+                }
+            }
+
+            iconElement.style.color = '#40e0d0';
+        }
+
+        // البحث عن المنشورات
+        function searchPosts(query) {
+            const posts = document.querySelectorAll('.post');
+            posts.forEach(post => {
+                const title = post.querySelector('.post-title').textContent.toLowerCase();
+                post.style.display = title.includes(query.toLowerCase()) ? 'block' : 'none';
+            });
+        }
+    </script>
+
+</body>
+</html>
